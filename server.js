@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const PORT = process.env.PORT || 3000
 
 app.set('view engine', 'jsx');
 app.engine('jsx', require('express-react-views').createEngine());
@@ -34,6 +35,6 @@ app.post('/fruits/', (req, res)=>{
     fruits.push(req.body);
 });
 
-app.listen(3000, () => {
+app.listen(PORT, () => {
     console.log('listening');
 });
