@@ -1,40 +1,33 @@
+require('dotenv').config();
 const express = require('express');
+const methodOverride = require('method-override');
 const app = express();
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT || 3000;
 
+
+const db = require('./models/db');
+db.once('open', () => {
+    console.log('Connected to Mongo');
+});
+
+
+// Initialize View Engine
 app.set('view engine', 'jsx');
 app.engine('jsx', require('express-react-views').createEngine());
 
-const fruits
 
-app.get('/fruits/', (req, res) => {
-    res.send(fruits);
+// Mount Express Middleware
+app.use((req, res, next) => {
+    res.locals.data = {};                               // Creates res.locals.data
+    next();
 });
+app.use(express.urlencoded({ extended: true }));        // Creates req.body
+app.use(methodOverride('_method'));                     // Allows us to override methods
+app.use(express.static('public'));                      // Allows us to have Static Files
+app.use('/fruits', require('./controllers/routeController.js'));    // Mounts our RESTFUL/INDUCES ROUTES at /fruits
 
-app.get('/fruits', function(req, res){
-    res.render('Index', { fruits: fruits });
-});        
-module.exports = fruits
 
-app.get('/fruits/new', (req, res)=>{
-    res.render('New');
-});
-
-app.use(express.urlencoded({extended:true}));
-
-app.post('/fruits/', (req, res)=>{
-    res.send(req.body);
-});
-
-app.post('/fruits/', (req, res)=>{
-    if(req.body.readyToEat === 'on'){ //if checked, req.body.readyToEat is set to 'on'
-        req.body.readyToEat = true;
-    } else { //if not checked, req.body.readyToEat is undefined
-        req.body.readyToEat = false;
-    }
-    fruits.push(req.body);
-});
-
+// Listen on PORT
 app.listen(PORT, () => {
-    console.log('listening');
+    console.log('Listening on port', PORT);
 });
